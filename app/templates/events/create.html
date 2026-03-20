@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Create Event - Arena Event Hub{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Create Event</h1>
+  <a href="/events" class="btn btn-outline-secondary">Back to events</a>
+</div>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+<form method="post" action="/events/new" class="row g-3">
+  <div class="col-md-6"><label class="form-label" for="title">Title</label><input class="form-control" type="text" id="title" name="title" required></div>
+  <div class="col-md-3"><label class="form-label" for="event_date">Event date</label><input class="form-control" type="date" id="event_date" name="event_date" required></div>
+  <div class="col-md-3"><label class="form-label" for="event_time_utc">Event time (UTC)</label><input class="form-control" type="time" id="event_time_utc" name="event_time_utc" required></div>
+  <div class="col-md-3"><label class="form-label" for="status">Status</label><input class="form-control" type="text" id="status" name="status" value="scheduled" required></div>
+  <div class="col-md-3"><label class="form-label" for="stage_name">Stage name</label><input class="form-control" type="text" id="stage_name" name="stage_name" value="Regular" required></div>
+  <div class="col-md-2"><label class="form-label" for="stage_ordering">Stage ordering</label><input class="form-control" type="number" id="stage_ordering" name="stage_ordering" value="1" min="1" required></div>
+  <div class="col-md-4"><label class="form-label" for="description">Description</label><input class="form-control" type="text" id="description" name="description"></div>
+  <div class="col-md-4"><label class="form-label" for="_sport_id">Sport</label><select class="form-select" id="_sport_id" name="_sport_id" required>{% for sport in sports %}<option value="{{ sport.id }}">{{ sport.name }}</option>{% endfor %}</select></div>
+  <div class="col-md-4"><label class="form-label" for="_competition_id">Competition</label><select class="form-select" id="_competition_id" name="_competition_id" required>{% for competition in competitions %}<option value="{{ competition.id }}">{{ competition.name }} ({{ competition.season }})</option>{% endfor %}</select></div>
+  <div class="col-md-4"><label class="form-label" for="_home_team_id">Home team (optional)</label><select class="form-select" id="_home_team_id" name="_home_team_id"><option value="">No home team</option>{% for team in teams %}<option value="{{ team.id }}">{{ team.name }}</option>{% endfor %}</select></div>
+  <div class="col-md-4"><label class="form-label" for="_away_team_id">Away team</label><select class="form-select" id="_away_team_id" name="_away_team_id" required>{% for team in teams %}<option value="{{ team.id }}">{{ team.name }}</option>{% endfor %}</select></div>
+  <div class="col-md-4"><label class="form-label" for="_venue_id">Venue (optional)</label><select class="form-select" id="_venue_id" name="_venue_id"><option value="">No venue</option>{% for venue in venues %}<option value="{{ venue.id }}">{{ venue.name }}</option>{% endfor %}</select></div>
+  <div class="col-12"><button class="btn btn-primary" type="submit">Create event</button></div>
+</form>
+{% endblock %}

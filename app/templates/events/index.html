@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Events - Arena Event Hub{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Events</h1>
+  <a class="btn btn-primary" href="/events/new">New Event</a>
+</div>
+<form method="get" action="/events" class="row g-2 mb-4">
+  <div class="col-md-4">
+    <label for="sport_id" class="form-label">Sport</label>
+    <select id="sport_id" name="sport_id" class="form-select">
+      <option value="">All sports</option>
+      {% for sport in sports %}
+      <option value="{{ sport.id }}" {% if selected_sport_id == sport.id %}selected{% endif %}>{{ sport.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label for="event_date" class="form-label">Event date</label>
+    <input id="event_date" name="event_date" type="date" class="form-control" value="{{ selected_event_date }}">
+  </div>
+  <div class="col-md-4 d-flex align-items-end gap-2">
+    <button type="submit" class="btn btn-outline-primary">Filter</button>
+    <a href="/events" class="btn btn-outline-secondary">Reset</a>
+  </div>
+</form>
+{% if events %}
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <thead>
+      <tr><th>Title</th><th>Date</th><th>Time (UTC)</th><th>Status</th><th>Sport</th><th>Competition</th><th>Venue</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for event in events %}
+      <tr>
+        <td>{{ event.title }}</td><td>{{ event.event_date }}</td><td>{{ event.event_time_utc }}</td><td>{{ event.status }}</td>
+        <td>{{ event.sport.name if event.sport else "-" }}</td><td>{{ event.competition.name if event.competition else "-" }}</td>
+        <td>{{ event.venue.name if event.venue else "-" }}</td><td><a href="/events/{{ event.id }}" class="btn btn-sm btn-outline-dark">View</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-light border">No events found.</div>
+{% endif %}
+{% endblock %}

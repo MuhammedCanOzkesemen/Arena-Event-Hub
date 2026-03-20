@@ -1,0 +1,14 @@
+This initial foundation focuses on clarity over complexity.
+
+What worked well:
+- Normalized entity model with explicit foreign keys.
+- Underscore-prefixed foreign key fields are consistent across all models.
+- A small repository-service-router flow keeps responsibilities clear.
+- API and HTML routes share the same service logic for predictable behavior.
+- Basic filtering by sport and event date is supported in both API and HTML views.
+- Tests validate core app availability and API list behavior.
+
+Trade-offs:
+- Table creation is done at startup for simplicity instead of migrations.
+- Validation is intentionally lightweight in this first version.
+- Authentication and authorization are intentionally omitted.
