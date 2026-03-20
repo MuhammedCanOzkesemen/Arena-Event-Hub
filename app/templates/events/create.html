@@ -75,19 +75,25 @@
       }
     }
 
-    function filterTeams() {
+    function syncTeamPairSelection() {
       const selectedCompetitionId = competitionSelect.value;
+      const selectedHome = homeTeamSelect.value;
+      const selectedAway = awayTeamSelect.value;
 
       Array.from(homeTeamSelect.options).forEach((option) => {
         if (option.value === "") {
           option.style.display = "";
           return;
         }
-        option.style.display = option.dataset.competitionId === selectedCompetitionId ? "" : "none";
+        const sameCompetition = option.dataset.competitionId === selectedCompetitionId;
+        const isSameAsAway = option.value === selectedAway;
+        option.style.display = sameCompetition && !isSameAsAway ? "" : "none";
       });
 
       Array.from(awayTeamSelect.options).forEach((option) => {
-        option.style.display = option.dataset.competitionId === selectedCompetitionId ? "" : "none";
+        const sameCompetition = option.dataset.competitionId === selectedCompetitionId;
+        const isSameAsHome = option.value === selectedHome && selectedHome !== "";
+        option.style.display = sameCompetition && !isSameAsHome ? "" : "none";
       });
 
       const visibleHome = visibleOptions(homeTeamSelect);
@@ -101,11 +107,17 @@
       }
     }
 
+    function filterTeams() {
+      syncTeamPairSelection();
+    }
+
     sportSelect.addEventListener("change", function () {
       filterCompetitions();
       filterTeams();
     });
     competitionSelect.addEventListener("change", filterTeams);
+    homeTeamSelect.addEventListener("change", syncTeamPairSelection);
+    awayTeamSelect.addEventListener("change", syncTeamPairSelection);
 
     filterCompetitions();
     filterTeams();
