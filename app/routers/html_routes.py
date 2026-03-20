@@ -27,11 +27,22 @@ def root_redirect() -> RedirectResponse:
 @router.get("/events")
 def events_page(
     request: Request,
-    sport_id: int | None = Query(default=None, gt=0),
-    event_date: date | None = Query(default=None),
+    sport_id: str | None = Query(default=None),
+    event_date: str | None = Query(default=None),
     db: Session = Depends(get_db),
 ):
-    events = service.list_events(db=db, sport_id=sport_id, event_date=event_date)
+    parsed_sport_id = None
+    if sport_id:
+        try:
+            parsed_sport_id = int(sport_id)
+        except ValueError:
+            parsed_sport_id = None
+
+    parsed_event_date = None
+    if event_date:
+        parsed_event_date = date.fromisoformat(event_date)
+
+    events = service.list_events(db=db, sport_id=parsed_sport_id, event_date=parsed_event_date)
     sports = list(db.scalars(select(Sport).order_by(Sport.name.asc())).all())
     return templates.TemplateResponse(
         request=request,
@@ -39,8 +50,8 @@ def events_page(
         context={
             "events": events,
             "sports": sports,
-            "selected_sport_id": sport_id,
-            "selected_event_date": event_date.isoformat() if event_date else "",
+            "selected_sport_id": parsed_sport_id,
+            "selected_event_date": parsed_event_date.isoformat() if parsed_event_date else "",
         },
     )
 

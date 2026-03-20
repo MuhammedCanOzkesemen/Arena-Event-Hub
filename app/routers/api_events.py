@@ -32,11 +32,22 @@ def _to_event_read(event) -> EventRead:
 
 @router.get("", response_model=list[EventRead])
 def list_events(
-    sport_id: int | None = Query(default=None, gt=0),
-    event_date: date | None = Query(default=None),
+    sport_id: str | None = Query(default=None),
+    event_date: str | None = Query(default=None),
     db: Session = Depends(get_db),
 ) -> list[EventRead]:
-    events = service.list_events(db=db, sport_id=sport_id, event_date=event_date)
+    parsed_sport_id = None
+    if sport_id:
+        try:
+            parsed_sport_id = int(sport_id)
+        except ValueError as exc:
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid sport_id") from exc
+
+    parsed_event_date = None
+    if event_date:
+        parsed_event_date = date.fromisoformat(event_date)
+
+    events = service.list_events(db=db, sport_id=parsed_sport_id, event_date=parsed_event_date)
     return [_to_event_read(item) for item in events]
 
 
