@@ -45,16 +45,6 @@ def events_page(
     )
 
 
-@router.get("/events/{event_id}")
-def event_detail_page(event_id: int, request: Request, db: Session = Depends(get_db)):
-    event = service.get_event(db=db, event_id=event_id)
-    if event is None:
-        return templates.TemplateResponse(
-            request=request, name="events/detail.html", context={"event": None}, status_code=status.HTTP_404_NOT_FOUND
-        )
-    return templates.TemplateResponse(request=request, name="events/detail.html", context={"event": event})
-
-
 @router.get("/events/new")
 def new_event_page(request: Request, db: Session = Depends(get_db)):
     sports = list(db.scalars(select(Sport).order_by(Sport.name.asc())).all())
@@ -114,3 +104,13 @@ def create_event_page(
             status_code=status.HTTP_400_BAD_REQUEST,
         )
     return RedirectResponse(url=f"/events/{event.id}", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.get("/events/{event_id}")
+def event_detail_page(event_id: int, request: Request, db: Session = Depends(get_db)):
+    event = service.get_event(db=db, event_id=event_id)
+    if event is None:
+        return templates.TemplateResponse(
+            request=request, name="events/detail.html", context={"event": None}, status_code=status.HTTP_404_NOT_FOUND
+        )
+    return templates.TemplateResponse(request=request, name="events/detail.html", context={"event": event})
