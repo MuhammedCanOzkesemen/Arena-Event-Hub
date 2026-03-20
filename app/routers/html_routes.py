@@ -61,6 +61,7 @@ def events_page(
             "selected_sport_id": parsed_sport_id,
             "selected_event_date": parsed_event_date.isoformat() if parsed_event_date else "",
             "selected_mode": selected_mode,
+            "deleted_success": request.query_params.get("deleted") == "1",
         },
     )
 
@@ -143,3 +144,11 @@ def event_detail_page(
         name="events/detail.html",
         context={"event": event, "created_success": created == "1"},
     )
+
+
+@router.post("/events/{event_id}/delete")
+def delete_event_page(event_id: int, db: Session = Depends(get_db)) -> RedirectResponse:
+    deleted = service.delete_event(db=db, event_id=event_id)
+    if deleted:
+        return RedirectResponse(url="/events?deleted=1", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url="/events", status_code=status.HTTP_303_SEE_OTHER)

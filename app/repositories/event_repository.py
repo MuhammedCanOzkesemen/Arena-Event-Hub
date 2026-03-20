@@ -77,3 +77,11 @@ class EventRepository:
         db.commit()
         db.refresh(event)
         return event
+
+    def delete_event(self, db: Session, event_id: int) -> bool:
+        event = db.get(Event, event_id)
+        if event is None:
+            return False
+        db.delete(event)
+        db.commit()
+        return True

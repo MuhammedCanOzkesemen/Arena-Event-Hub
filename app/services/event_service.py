@@ -32,6 +32,9 @@ class EventService:
         self._validate_references(db=db, payload=payload)
         return self.repository.create_event(db=db, event_data=payload)
 
+    def delete_event(self, db: Session, event_id: int) -> bool:
+        return self.repository.delete_event(db=db, event_id=event_id)
+
     def _validate_references(self, db: Session, payload: EventCreate) -> None:
         if payload.sport_id <= 0:
             raise ValueError("Sport is required")

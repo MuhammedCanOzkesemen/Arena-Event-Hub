@@ -5,6 +5,9 @@
   <h1 class="h3 mb-0">Events</h1>
   <a class="btn btn-primary" href="/events/new">New Event</a>
 </div>
+{% if deleted_success %}
+<div class="alert alert-success">Event deleted successfully.</div>
+{% endif %}
 <form method="get" action="/events" class="row g-2 mb-4">
   <div class="col-md-4">
     <label for="sport_id" class="form-label">Sport</label>
