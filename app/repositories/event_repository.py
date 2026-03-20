@@ -14,6 +14,8 @@ class EventRepository:
         sport_id: int | None = None,
         event_date: date | None = None,
         mode: str = "upcoming",
+        page: int = 1,
+        page_size: int = 5,
     ) -> list[Event]:
         statement: Select[tuple[Event]] = (
             select(Event)
@@ -41,6 +43,9 @@ class EventRepository:
             statement = statement.order_by(Event.event_date.desc(), Event.event_time_utc.desc(), Event.id.desc())
         else:
             statement = statement.order_by(Event.event_date.asc(), Event.event_time_utc.asc(), Event.id.asc())
+
+        offset = (page - 1) * page_size
+        statement = statement.offset(offset).limit(page_size)
 
         return list(db.scalars(statement).all())
 

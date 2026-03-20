@@ -30,6 +30,7 @@ def events_page(
     sport_id: str | None = Query(default=None),
     event_date: str | None = Query(default=None),
     mode: str = Query(default="upcoming"),
+    page: int = Query(default=1, ge=1),
     db: Session = Depends(get_db),
 ):
     selected_mode = mode if mode in {"upcoming", "all", "past"} else "upcoming"
@@ -48,12 +49,19 @@ def events_page(
         except ValueError:
             parsed_event_date = None
 
-    events = service.list_events(
+    page_size = 5
+    events_with_probe = service.list_events(
         db=db,
         sport_id=parsed_sport_id,
         event_date=parsed_event_date,
         mode=selected_mode,
+        page=page,
+        page_size=page_size + 1,
     )
+    has_next = len(events_with_probe) > page_size
+    events = events_with_probe[:page_size]
+    has_prev = page > 1
+
     sports = list(db.scalars(select(Sport).order_by(Sport.name.asc())).all())
     return templates.TemplateResponse(
         request=request,
@@ -65,6 +73,9 @@ def events_page(
             "selected_event_date": parsed_event_date.isoformat() if parsed_event_date else "",
             "selected_mode": selected_mode,
             "deleted_success": request.query_params.get("deleted") == "1",
+            "page": page,
+            "has_prev": has_prev,
+            "has_next": has_next,
         },
     )
 

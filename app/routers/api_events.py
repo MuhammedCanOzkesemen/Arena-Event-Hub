@@ -35,6 +35,7 @@ def list_events(
     sport_id: str | None = Query(default=None),
     event_date: str | None = Query(default=None),
     mode: str = Query(default="upcoming"),
+    page: int = Query(default=1, ge=1),
     db: Session = Depends(get_db),
 ) -> list[EventRead]:
     selected_mode = mode if mode in {"upcoming", "all", "past"} else "upcoming"
@@ -58,6 +59,8 @@ def list_events(
         sport_id=parsed_sport_id,
         event_date=parsed_event_date,
         mode=selected_mode,
+        page=page,
+        page_size=5,
     )
     return [_to_event_read(item) for item in events]
 

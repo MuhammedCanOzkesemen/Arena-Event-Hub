@@ -52,6 +52,32 @@
     </tbody>
   </table>
 </div>
+<div class="d-flex justify-content-between align-items-center mt-3">
+  <div>Page {{ page }}</div>
+  <div class="d-flex gap-2">
+    {% if has_prev %}
+    <a
+      class="btn btn-outline-secondary"
+      href="/events?page={{ page - 1 }}{% if selected_mode %}&mode={{ selected_mode }}{% endif %}{% if selected_sport_id %}&sport_id={{ selected_sport_id }}{% endif %}{% if selected_event_date %}&event_date={{ selected_event_date }}{% endif %}"
+    >
+      Previous
+    </a>
+    {% else %}
+    <button class="btn btn-outline-secondary" disabled>Previous</button>
+    {% endif %}
+
+    {% if has_next %}
+    <a
+      class="btn btn-outline-secondary"
+      href="/events?page={{ page + 1 }}{% if selected_mode %}&mode={{ selected_mode }}{% endif %}{% if selected_sport_id %}&sport_id={{ selected_sport_id }}{% endif %}{% if selected_event_date %}&event_date={{ selected_event_date }}{% endif %}"
+    >
+      Next
+    </a>
+    {% else %}
+    <button class="btn btn-outline-secondary" disabled>Next</button>
+    {% endif %}
+  </div>
+</div>
 {% else %}
 <div class="alert alert-light border">No events found for the selected filters</div>
 {% endif %}

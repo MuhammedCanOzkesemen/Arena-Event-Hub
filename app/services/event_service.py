@@ -22,8 +22,17 @@ class EventService:
         sport_id: int | None = None,
         event_date: date | None = None,
         mode: str = "upcoming",
+        page: int = 1,
+        page_size: int = 5,
     ) -> list[Event]:
-        return self.repository.list_events(db=db, sport_id=sport_id, event_date=event_date, mode=mode)
+        return self.repository.list_events(
+            db=db,
+            sport_id=sport_id,
+            event_date=event_date,
+            mode=mode,
+            page=page,
+            page_size=page_size,
+        )
 
     def get_event(self, db: Session, event_id: int) -> Event | None:
         return self.repository.get_event(db=db, event_id=event_id)
