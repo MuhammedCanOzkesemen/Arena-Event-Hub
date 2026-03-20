@@ -7,9 +7,21 @@
 </div>
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 <form method="post" action="/events/new" class="row g-3">
-  <div class="col-md-6"><label class="form-label" for="title">Title</label><input class="form-control" type="text" id="title" name="title" required></div>
+  <div class="col-md-6"><label class="form-label" for="title">Title (optional)</label><input class="form-control" type="text" id="title" name="title" placeholder="Auto-generated if left blank"></div>
   <div class="col-md-3"><label class="form-label" for="event_date">Event date</label><input class="form-control" type="date" id="event_date" name="event_date" required></div>
-  <div class="col-md-3"><label class="form-label" for="event_time_utc">Event time (UTC)</label><input class="form-control" type="time" id="event_time_utc" name="event_time_utc" required></div>
+  <div class="col-md-3">
+    <label class="form-label" for="event_time_utc">Event time (UTC)</label>
+    <input
+      class="form-control"
+      type="text"
+      id="event_time_utc"
+      name="event_time_utc"
+      placeholder="HH:MM"
+      pattern="^([01]\d|2[0-3]):([0-5]\d)$"
+      inputmode="numeric"
+      required
+    >
+  </div>
   <div class="col-md-3"><label class="form-label" for="status">Status</label><input class="form-control" type="text" id="status" name="status" value="scheduled" required></div>
   <div class="col-md-3"><label class="form-label" for="stage_name">Stage name</label><input class="form-control" type="text" id="stage_name" name="stage_name" value="Regular" required></div>
   <div class="col-md-2"><label class="form-label" for="stage_ordering">Stage ordering</label><input class="form-control" type="number" id="stage_ordering" name="stage_ordering" value="1" min="1" required></div>

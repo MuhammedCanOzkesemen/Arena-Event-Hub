@@ -43,7 +43,10 @@ def events_page(
 
     parsed_event_date = None
     if event_date:
-        parsed_event_date = date.fromisoformat(event_date)
+        try:
+            parsed_event_date = date.fromisoformat(event_date)
+        except ValueError:
+            parsed_event_date = None
 
     events = service.list_events(
         db=db,

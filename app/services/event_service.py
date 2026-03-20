@@ -64,12 +64,15 @@ class EventService:
         if away_team._competition_id != competition.id:
             raise ValueError("Away team does not belong to selected competition")
 
+        home_team = None
         if payload.home_team_id is not None:
             home_team = db.get(Team, payload.home_team_id)
             if home_team is None:
                 raise ValueError("Home team not found")
             if home_team._competition_id != competition.id:
                 raise ValueError("Home team does not belong to selected competition")
+
+        self._apply_generated_title(payload=payload, home_team=home_team, away_team=away_team)
 
         if payload.venue_id is not None and db.get(Venue, payload.venue_id) is None:
             raise ValueError("Venue not found")
@@ -87,3 +90,9 @@ class EventService:
         is_duplicate = db.scalar(duplicate_stmt.limit(1)) is not None
         if is_duplicate:
             raise ValueError("Duplicate event exists for this competition, teams, and date")
+
+    def _apply_generated_title(self, payload: EventCreate, home_team: Team | None, away_team: Team) -> None:
+        if payload.title.strip():
+            return
+        home_name = home_team.name if home_team is not None else "TBD"
+        payload.title = f"{home_name} vs {away_team.name}"

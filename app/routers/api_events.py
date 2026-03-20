@@ -48,7 +48,10 @@ def list_events(
 
     parsed_event_date = None
     if event_date:
-        parsed_event_date = date.fromisoformat(event_date)
+        try:
+            parsed_event_date = date.fromisoformat(event_date)
+        except ValueError as exc:
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid event_date") from exc
 
     events = service.list_events(
         db=db,

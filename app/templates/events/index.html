@@ -44,7 +44,7 @@
     <tbody>
       {% for event in events %}
       <tr>
-        <td>{{ event.title }}</td><td>{{ event.event_date }}</td><td>{{ event.event_time_utc }}</td><td>{{ event.status }}</td>
+        <td>{{ event.title }}</td><td>{{ event.event_date }}</td><td>{{ event.event_time_utc.strftime("%H:%M") }}</td><td>{{ event.status }}</td>
         <td>{{ event.sport.name if event.sport else "-" }}</td><td>{{ event.competition.name if event.competition else "-" }}</td>
         <td>{{ event.venue.name if event.venue else "-" }}</td><td><a href="/events/{{ event.id }}" class="btn btn-sm btn-outline-dark">View</a></td>
       </tr>
@@ -53,6 +53,6 @@
   </table>
 </div>
 {% else %}
-<div class="alert alert-light border">No events found.</div>
+<div class="alert alert-light border">No events found for the selected filters</div>
 {% endif %}
 {% endblock %}
