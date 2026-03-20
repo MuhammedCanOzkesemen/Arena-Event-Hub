@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
 from app.core.database import Base, engine
+from app.core.seed import seed_sample_data_if_empty
 from app.routers.api_events import router as api_events_router
 from app.routers.html_routes import router as html_router
 
@@ -12,6 +13,7 @@ from app.routers.html_routes import router as html_router
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     Base.metadata.create_all(bind=engine)
+    seed_sample_data_if_empty()
     yield
 
 

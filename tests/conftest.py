@@ -17,8 +17,13 @@ def setup_database():
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
+    engine.dispose()
     if test_db_path.exists():
-        test_db_path.unlink()
+        try:
+            test_db_path.unlink()
+        except PermissionError:
+            # Windows may keep the SQLite file locked briefly.
+            pass
 
 
 @pytest.fixture
