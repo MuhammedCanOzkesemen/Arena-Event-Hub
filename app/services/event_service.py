@@ -26,14 +26,30 @@ class EventService:
         return self.repository.create_event(db=db, event_data=payload)
 
     def _validate_references(self, db: Session, payload: EventCreate) -> None:
-        if db.get(Sport, payload.sport_id) is None:
+        sport = db.get(Sport, payload.sport_id)
+        if sport is None:
             raise ValueError("Sport not found")
-        if db.get(Competition, payload.competition_id) is None:
+
+        competition = db.get(Competition, payload.competition_id)
+        if competition is None:
             raise ValueError("Competition not found")
-        if db.get(Team, payload.away_team_id) is None:
+
+        if competition._sport_id != sport.id:
+            raise ValueError("Competition does not belong to selected sport")
+
+        away_team = db.get(Team, payload.away_team_id)
+        if away_team is None:
             raise ValueError("Away team not found")
-        if payload.home_team_id is not None and db.get(Team, payload.home_team_id) is None:
-            raise ValueError("Home team not found")
+        if away_team._competition_id != competition.id:
+            raise ValueError("Away team does not belong to selected competition")
+
+        if payload.home_team_id is not None:
+            home_team = db.get(Team, payload.home_team_id)
+            if home_team is None:
+                raise ValueError("Home team not found")
+            if home_team._competition_id != competition.id:
+                raise ValueError("Home team does not belong to selected competition")
+
         if payload.venue_id is not None and db.get(Venue, payload.venue_id) is None:
             raise ValueError("Venue not found")
         if payload.home_team_id is not None and payload.home_team_id == payload.away_team_id:

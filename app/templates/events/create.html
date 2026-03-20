@@ -14,11 +14,101 @@
   <div class="col-md-3"><label class="form-label" for="stage_name">Stage name</label><input class="form-control" type="text" id="stage_name" name="stage_name" value="Regular" required></div>
   <div class="col-md-2"><label class="form-label" for="stage_ordering">Stage ordering</label><input class="form-control" type="number" id="stage_ordering" name="stage_ordering" value="1" min="1" required></div>
   <div class="col-md-4"><label class="form-label" for="description">Description</label><input class="form-control" type="text" id="description" name="description"></div>
-  <div class="col-md-4"><label class="form-label" for="_sport_id">Sport</label><select class="form-select" id="_sport_id" name="_sport_id" required>{% for sport in sports %}<option value="{{ sport.id }}">{{ sport.name }}</option>{% endfor %}</select></div>
-  <div class="col-md-4"><label class="form-label" for="_competition_id">Competition</label><select class="form-select" id="_competition_id" name="_competition_id" required>{% for competition in competitions %}<option value="{{ competition.id }}">{{ competition.name }} ({{ competition.season }})</option>{% endfor %}</select></div>
-  <div class="col-md-4"><label class="form-label" for="_home_team_id">Home team (optional)</label><select class="form-select" id="_home_team_id" name="_home_team_id"><option value="">No home team</option>{% for team in teams %}<option value="{{ team.id }}">{{ team.name }}</option>{% endfor %}</select></div>
-  <div class="col-md-4"><label class="form-label" for="_away_team_id">Away team</label><select class="form-select" id="_away_team_id" name="_away_team_id" required>{% for team in teams %}<option value="{{ team.id }}">{{ team.name }}</option>{% endfor %}</select></div>
+  <div class="col-md-4">
+    <label class="form-label" for="_sport_id">Sport</label>
+    <select class="form-select" id="_sport_id" name="_sport_id" required>
+      {% for sport in sports %}
+      <option value="{{ sport.id }}">{{ sport.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label" for="_competition_id">Competition</label>
+    <select class="form-select" id="_competition_id" name="_competition_id" required>
+      {% for competition in competitions %}
+      <option value="{{ competition.id }}" data-sport-id="{{ competition._sport_id }}">
+        {{ competition.name }} ({{ competition.season }})
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label" for="_home_team_id">Home team (optional)</label>
+    <select class="form-select" id="_home_team_id" name="_home_team_id">
+      <option value="">No home team</option>
+      {% for team in teams %}
+      <option value="{{ team.id }}" data-competition-id="{{ team._competition_id }}">{{ team.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label" for="_away_team_id">Away team</label>
+    <select class="form-select" id="_away_team_id" name="_away_team_id" required>
+      {% for team in teams %}
+      <option value="{{ team.id }}" data-competition-id="{{ team._competition_id }}">{{ team.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
   <div class="col-md-4"><label class="form-label" for="_venue_id">Venue (optional)</label><select class="form-select" id="_venue_id" name="_venue_id"><option value="">No venue</option>{% for venue in venues %}<option value="{{ venue.id }}">{{ venue.name }}</option>{% endfor %}</select></div>
   <div class="col-12"><button class="btn btn-primary" type="submit">Create event</button></div>
 </form>
+<script>
+  (function () {
+    const sportSelect = document.getElementById("_sport_id");
+    const competitionSelect = document.getElementById("_competition_id");
+    const homeTeamSelect = document.getElementById("_home_team_id");
+    const awayTeamSelect = document.getElementById("_away_team_id");
+
+    function visibleOptions(selectEl) {
+      return Array.from(selectEl.options).filter((option) => option.style.display !== "none" && option.value !== "");
+    }
+
+    function filterCompetitions() {
+      const selectedSportId = sportSelect.value;
+      Array.from(competitionSelect.options).forEach((option) => {
+        option.style.display = option.dataset.sportId === selectedSportId ? "" : "none";
+      });
+
+      const visible = visibleOptions(competitionSelect);
+      if (!visible.some((option) => option.value === competitionSelect.value)) {
+        competitionSelect.value = visible.length > 0 ? visible[0].value : "";
+      }
+    }
+
+    function filterTeams() {
+      const selectedCompetitionId = competitionSelect.value;
+
+      Array.from(homeTeamSelect.options).forEach((option) => {
+        if (option.value === "") {
+          option.style.display = "";
+          return;
+        }
+        option.style.display = option.dataset.competitionId === selectedCompetitionId ? "" : "none";
+      });
+
+      Array.from(awayTeamSelect.options).forEach((option) => {
+        option.style.display = option.dataset.competitionId === selectedCompetitionId ? "" : "none";
+      });
+
+      const visibleHome = visibleOptions(homeTeamSelect);
+      if (homeTeamSelect.value !== "" && !visibleHome.some((option) => option.value === homeTeamSelect.value)) {
+        homeTeamSelect.value = "";
+      }
+
+      const visibleAway = visibleOptions(awayTeamSelect);
+      if (!visibleAway.some((option) => option.value === awayTeamSelect.value)) {
+        awayTeamSelect.value = visibleAway.length > 0 ? visibleAway[0].value : "";
+      }
+    }
+
+    sportSelect.addEventListener("change", function () {
+      filterCompetitions();
+      filterTeams();
+    });
+    competitionSelect.addEventListener("change", filterTeams);
+
+    filterCompetitions();
+    filterTeams();
+  })();
+</script>
 {% endblock %}
