@@ -19,7 +19,15 @@
     <label for="event_date" class="form-label">Event date</label>
     <input id="event_date" name="event_date" type="date" class="form-control" value="{{ selected_event_date }}">
   </div>
-  <div class="col-md-4 d-flex align-items-end gap-2">
+  <div class="col-md-4">
+    <label for="mode" class="form-label">View</label>
+    <select id="mode" name="mode" class="form-select">
+      <option value="upcoming" {% if selected_mode == "upcoming" %}selected{% endif %}>Upcoming</option>
+      <option value="all" {% if selected_mode == "all" %}selected{% endif %}>All</option>
+      <option value="past" {% if selected_mode == "past" %}selected{% endif %}>Past</option>
+    </select>
+  </div>
+  <div class="col-12 d-flex gap-2">
     <button type="submit" class="btn btn-outline-primary">Filter</button>
     <a href="/events" class="btn btn-outline-secondary">Reset</a>
   </div>

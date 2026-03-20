@@ -29,8 +29,11 @@ def events_page(
     request: Request,
     sport_id: str | None = Query(default=None),
     event_date: str | None = Query(default=None),
+    mode: str = Query(default="upcoming"),
     db: Session = Depends(get_db),
 ):
+    selected_mode = mode if mode in {"upcoming", "all", "past"} else "upcoming"
+
     parsed_sport_id = None
     if sport_id:
         try:
@@ -42,7 +45,12 @@ def events_page(
     if event_date:
         parsed_event_date = date.fromisoformat(event_date)
 
-    events = service.list_events(db=db, sport_id=parsed_sport_id, event_date=parsed_event_date)
+    events = service.list_events(
+        db=db,
+        sport_id=parsed_sport_id,
+        event_date=parsed_event_date,
+        mode=selected_mode,
+    )
     sports = list(db.scalars(select(Sport).order_by(Sport.name.asc())).all())
     return templates.TemplateResponse(
         request=request,
@@ -52,6 +60,7 @@ def events_page(
             "sports": sports,
             "selected_sport_id": parsed_sport_id,
             "selected_event_date": parsed_event_date.isoformat() if parsed_event_date else "",
+            "selected_mode": selected_mode,
         },
     )
 
@@ -114,14 +123,23 @@ def create_event_page(
             context={"sports": sports, "competitions": competitions, "teams": teams, "venues": venues, "error": str(exc)},
             status_code=status.HTTP_400_BAD_REQUEST,
         )
-    return RedirectResponse(url=f"/events/{event.id}", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url=f"/events/{event.id}?created=1", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @router.get("/events/{event_id}")
-def event_detail_page(event_id: int, request: Request, db: Session = Depends(get_db)):
+def event_detail_page(
+    event_id: int,
+    request: Request,
+    created: str | None = Query(default=None),
+    db: Session = Depends(get_db),
+):
     event = service.get_event(db=db, event_id=event_id)
     if event is None:
         return templates.TemplateResponse(
             request=request, name="events/detail.html", context={"event": None}, status_code=status.HTTP_404_NOT_FOUND
         )
-    return templates.TemplateResponse(request=request, name="events/detail.html", context={"event": event})
+    return templates.TemplateResponse(
+        request=request,
+        name="events/detail.html",
+        context={"event": event, "created_success": created == "1"},
+    )

@@ -13,6 +13,7 @@ class EventRepository:
         db: Session,
         sport_id: int | None = None,
         event_date: date | None = None,
+        mode: str = "upcoming",
     ) -> list[Event]:
         statement: Select[tuple[Event]] = (
             select(Event)
@@ -23,13 +24,23 @@ class EventRepository:
                 joinedload(Event.away_team),
                 joinedload(Event.venue),
             )
-            .order_by(Event.event_date.asc(), Event.event_time_utc.asc(), Event.id.asc())
         )
 
         if sport_id is not None:
             statement = statement.where(Event._sport_id == sport_id)
         if event_date is not None:
             statement = statement.where(Event.event_date == event_date)
+        else:
+            today = date.today()
+            if mode == "upcoming":
+                statement = statement.where(Event.event_date >= today)
+            elif mode == "past":
+                statement = statement.where(Event.event_date < today)
+
+        if mode == "past":
+            statement = statement.order_by(Event.event_date.desc(), Event.event_time_utc.desc(), Event.id.desc())
+        else:
+            statement = statement.order_by(Event.event_date.asc(), Event.event_time_utc.asc(), Event.id.asc())
 
         return list(db.scalars(statement).all())
 

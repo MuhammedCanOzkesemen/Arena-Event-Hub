@@ -1,5 +1,6 @@
 from datetime import date
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.competition import Competition
@@ -15,8 +16,14 @@ class EventService:
     def __init__(self, repository: EventRepository | None = None) -> None:
         self.repository = repository or EventRepository()
 
-    def list_events(self, db: Session, sport_id: int | None = None, event_date: date | None = None) -> list[Event]:
-        return self.repository.list_events(db=db, sport_id=sport_id, event_date=event_date)
+    def list_events(
+        self,
+        db: Session,
+        sport_id: int | None = None,
+        event_date: date | None = None,
+        mode: str = "upcoming",
+    ) -> list[Event]:
+        return self.repository.list_events(db=db, sport_id=sport_id, event_date=event_date, mode=mode)
 
     def get_event(self, db: Session, event_id: int) -> Event | None:
         return self.repository.get_event(db=db, event_id=event_id)
@@ -26,6 +33,17 @@ class EventService:
         return self.repository.create_event(db=db, event_data=payload)
 
     def _validate_references(self, db: Session, payload: EventCreate) -> None:
+        if payload.sport_id <= 0:
+            raise ValueError("Sport is required")
+        if payload.competition_id <= 0:
+            raise ValueError("Competition is required")
+        if payload.away_team_id <= 0:
+            raise ValueError("Away team is required")
+        if payload.event_date < date.today():
+            raise ValueError("Event date cannot be in the past")
+        if payload.home_team_id is not None and payload.home_team_id == payload.away_team_id:
+            raise ValueError("Home team and away team must be different")
+
         sport = db.get(Sport, payload.sport_id)
         if sport is None:
             raise ValueError("Sport not found")
@@ -52,5 +70,17 @@ class EventService:
 
         if payload.venue_id is not None and db.get(Venue, payload.venue_id) is None:
             raise ValueError("Venue not found")
-        if payload.home_team_id is not None and payload.home_team_id == payload.away_team_id:
-            raise ValueError("Home team and away team must be different")
+
+        duplicate_stmt = select(Event.id).where(
+            Event._competition_id == payload.competition_id,
+            Event._away_team_id == payload.away_team_id,
+            Event.event_date == payload.event_date,
+        )
+        if payload.home_team_id is None:
+            duplicate_stmt = duplicate_stmt.where(Event._home_team_id.is_(None))
+        else:
+            duplicate_stmt = duplicate_stmt.where(Event._home_team_id == payload.home_team_id)
+
+        is_duplicate = db.scalar(duplicate_stmt.limit(1)) is not None
+        if is_duplicate:
+            raise ValueError("Duplicate event exists for this competition, teams, and date")

@@ -34,8 +34,11 @@ def _to_event_read(event) -> EventRead:
 def list_events(
     sport_id: str | None = Query(default=None),
     event_date: str | None = Query(default=None),
+    mode: str = Query(default="upcoming"),
     db: Session = Depends(get_db),
 ) -> list[EventRead]:
+    selected_mode = mode if mode in {"upcoming", "all", "past"} else "upcoming"
+
     parsed_sport_id = None
     if sport_id:
         try:
@@ -47,7 +50,12 @@ def list_events(
     if event_date:
         parsed_event_date = date.fromisoformat(event_date)
 
-    events = service.list_events(db=db, sport_id=parsed_sport_id, event_date=parsed_event_date)
+    events = service.list_events(
+        db=db,
+        sport_id=parsed_sport_id,
+        event_date=parsed_event_date,
+        mode=selected_mode,
+    )
     return [_to_event_read(item) for item in events]
 
 

@@ -5,6 +5,9 @@
   <div class="alert alert-danger">Event not found.</div>
   <a href="/events" class="btn btn-secondary">Back to events</a>
 {% else %}
+  {% if created_success %}
+  <div class="alert alert-success">Event created successfully.</div>
+  {% endif %}
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 mb-0">{{ event.title }}</h1>
     <a href="/events" class="btn btn-outline-secondary">Back to events</a>
