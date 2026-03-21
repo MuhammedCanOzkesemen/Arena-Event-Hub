@@ -74,6 +74,9 @@ def seed_sample_data_if_empty() -> None:
             if venue is None:
                 venue = Venue(name=name, city=city, country_code=country_code)
                 db.add(venue)
+            else:
+                venue.city = city
+                venue.country_code = country_code
             return venue
 
         def get_or_create_event(
@@ -128,419 +131,166 @@ def seed_sample_data_if_empty() -> None:
                 event._venue_id = venue_id
             return event
 
-        football = get_or_create_sport("Football")
-        basketball = get_or_create_sport("Basketball")
-        tennis = get_or_create_sport("Tennis")
+        sports = {
+            "football": get_or_create_sport("Football"),
+            "basketball": get_or_create_sport("Basketball"),
+            "tennis": get_or_create_sport("Tennis"),
+            "f1": get_or_create_sport("Formula 1"),
+            "mma": get_or_create_sport("MMA"),
+        }
 
-        ucl = get_or_create_competition("UCL", "UEFA Champions League", "2025/26", football.id)
-        premier_league = get_or_create_competition("EPL", "Premier League", "2025/26", football.id)
-        la_liga = get_or_create_competition("LL", "La Liga", "2025/26", football.id)
+        competitions = {
+            "ucl": get_or_create_competition("UCL", "UEFA Champions League", "2025/26", sports["football"].id),
+            "epl": get_or_create_competition("EPL", "Premier League", "2025/26", sports["football"].id),
+            "laliga": get_or_create_competition("LL", "La Liga", "2025/26", sports["football"].id),
+            "seriea": get_or_create_competition("SA", "Serie A", "2025/26", sports["football"].id),
+            "nba": get_or_create_competition("NBA", "NBA", "2025/26", sports["basketball"].id),
+            "euroleague": get_or_create_competition("EL", "EuroLeague", "2025/26", sports["basketball"].id),
+            "atp": get_or_create_competition("ATP", "ATP Tour", "2025", sports["tennis"].id),
+            "wimbledon": get_or_create_competition("WIM", "Wimbledon", "2025", sports["tennis"].id),
+            "rg": get_or_create_competition("RG", "Roland Garros", "2025", sports["tennis"].id),
+            "usopen": get_or_create_competition("USO", "US Open", "2025", sports["tennis"].id),
+            "f1wc": get_or_create_competition("F1WC", "Formula 1 World Championship", "2025", sports["f1"].id),
+            "ufc": get_or_create_competition("UFC", "UFC", "2025", sports["mma"].id),
+            "pfl": get_or_create_competition("PFL", "Professional Fighters League", "2025", sports["mma"].id),
+        }
 
-        nba = get_or_create_competition("NBA", "NBA", "2025/26", basketball.id)
-        euroleague = get_or_create_competition("EL", "EuroLeague", "2025/26", basketball.id)
+        team_specs = [
+            ("Real Madrid", "Real Madrid Club de Futbol", "real-madrid", "RMA", "ES", "laliga"),
+            ("Barcelona", "Futbol Club Barcelona", "barcelona", "BAR", "ES", "laliga"),
+            ("Manchester City", "Manchester City Football Club", "manchester-city", "MCI", "GB", "epl"),
+            ("Liverpool", "Liverpool Football Club", "liverpool", "LIV", "GB", "epl"),
+            ("Arsenal", "Arsenal Football Club", "arsenal", "ARS", "GB", "epl"),
+            ("Bayern Munich", "FC Bayern Munich", "bayern-munich", "BAY", "DE", "ucl"),
+            ("Inter Milan", "Football Club Internazionale Milano", "inter-milan", "INT", "IT", "seriea"),
+            ("Paris Saint-Germain", "Paris Saint-Germain Football Club", "paris-saint-germain", "PSG", "FR", "ucl"),
+            ("Borussia Dortmund", "Ballspielverein Borussia 09 Dortmund", "borussia-dortmund", "BVB", "DE", "ucl"),
+            ("Juventus", "Juventus Football Club", "juventus", "JUV", "IT", "seriea"),
+            ("Los Angeles Lakers", "Los Angeles Lakers", "los-angeles-lakers", "LAL", "US", "nba"),
+            ("Boston Celtics", "Boston Celtics", "boston-celtics", "BOS", "US", "nba"),
+            ("Golden State Warriors", "Golden State Warriors", "golden-state-warriors", "GSW", "US", "nba"),
+            ("Chicago Bulls", "Chicago Bulls", "chicago-bulls", "CHI", "US", "nba"),
+            ("Miami Heat", "Miami Heat", "miami-heat", "MIA", "US", "nba"),
+            ("Milwaukee Bucks", "Milwaukee Bucks", "milwaukee-bucks", "MIL", "US", "nba"),
+            ("Real Madrid Basketball", "Real Madrid Baloncesto", "real-madrid-basketball", "RMB", "ES", "euroleague"),
+            ("Fenerbahce Beko", "Fenerbahce Beko Istanbul", "fenerbahce-beko", "FB", "TR", "euroleague"),
+            ("Anadolu Efes", "Anadolu Efes S.K.", "anadolu-efes", "EFS", "TR", "euroleague"),
+            ("Olympiacos", "Olympiacos B.C.", "olympiacos", "OLY", "GR", "euroleague"),
+            ("Novak Djokovic", "Novak Djokovic", "novak-djokovic", "NJD", "RS", "atp"),
+            ("Carlos Alcaraz", "Carlos Alcaraz", "carlos-alcaraz", "CAL", "ES", "atp"),
+            ("Daniil Medvedev", "Daniil Medvedev", "daniil-medvedev", "DME", "RU", "atp"),
+            ("Jannik Sinner", "Jannik Sinner", "jannik-sinner", "JSI", "IT", "atp"),
+            ("Alexander Zverev", "Alexander Zverev", "alexander-zverev", "AZV", "DE", "wimbledon"),
+            ("Stefanos Tsitsipas", "Stefanos Tsitsipas", "stefanos-tsitsipas", "STS", "GR", "wimbledon"),
+            ("Casper Ruud", "Casper Ruud", "casper-ruud", "CRU", "NO", "rg"),
+            ("Holger Rune", "Holger Rune", "holger-rune", "HRU", "DK", "rg"),
+            ("Max Verstappen", "Max Verstappen", "max-verstappen", "VER", "NL", "f1wc"),
+            ("Lewis Hamilton", "Lewis Hamilton", "lewis-hamilton", "HAM", "GB", "f1wc"),
+            ("Charles Leclerc", "Charles Leclerc", "charles-leclerc", "LEC", "MC", "f1wc"),
+            ("Lando Norris", "Lando Norris", "lando-norris", "NOR", "GB", "f1wc"),
+            ("George Russell", "George Russell", "george-russell", "RUS", "GB", "f1wc"),
+            ("Fernando Alonso", "Fernando Alonso", "fernando-alonso", "ALO", "ES", "f1wc"),
+            ("Islam Makhachev", "Islam Makhachev", "islam-makhachev", "IMK", "RU", "ufc"),
+            ("Leon Edwards", "Leon Edwards", "leon-edwards", "LED", "GB", "pfl"),
+            ("Alex Pereira", "Alex Pereira", "alex-pereira", "APE", "BR", "ufc"),
+            ("Sean O'Malley", "Sean O'Malley", "sean-omalley", "SOM", "US", "ufc"),
+            ("Tom Aspinall", "Tom Aspinall", "tom-aspinall", "TAS", "GB", "pfl"),
+            ("Khamzat Chimaev", "Khamzat Chimaev", "khamzat-chimaev", "KHC", "AE", "ufc"),
+        ]
 
-        atp_tour = get_or_create_competition("ATP", "ATP Tour", "2025", tennis.id)
-        wimbledon = get_or_create_competition("WIM", "Wimbledon", "2025", tennis.id)
-        roland_garros = get_or_create_competition("RG", "Roland Garros", "2025", tennis.id)
+        teams: dict[str, Team] = {}
+        for name, official_name, slug, abbreviation, country_code, competition_key in team_specs:
+            teams[slug] = get_or_create_team(
+                name=name,
+                official_name=official_name,
+                slug=slug,
+                abbreviation=abbreviation,
+                country_code=country_code,
+                competition_id=competitions[competition_key].id,
+            )
 
-        real_madrid = get_or_create_team(
-            "Real Madrid",
-            "Real Madrid Club de Futbol",
-            "real-madrid",
-            "RMA",
-            "ES",
-            la_liga.id,
-        )
-        manchester_city = get_or_create_team(
-            "Manchester City",
-            "Manchester City Football Club",
-            "manchester-city",
-            "MCI",
-            "GB",
-            premier_league.id,
-        )
-        barcelona = get_or_create_team(
-            "Barcelona",
-            "Futbol Club Barcelona",
-            "barcelona",
-            "FCB",
-            "ES",
-            la_liga.id,
-        )
-        liverpool = get_or_create_team(
-            "Liverpool",
-            "Liverpool Football Club",
-            "liverpool",
-            "LIV",
-            "GB",
-            premier_league.id,
-        )
-        arsenal = get_or_create_team(
-            "Arsenal",
-            "Arsenal Football Club",
-            "arsenal",
-            "ARS",
-            "GB",
-            premier_league.id,
-        )
-        bayern_munich = get_or_create_team(
-            "Bayern Munich",
-            "FC Bayern Munich",
-            "bayern-munich",
-            "BAY",
-            "DE",
-            ucl.id,
-        )
-        inter_milan = get_or_create_team(
-            "Inter Milan",
-            "Football Club Internazionale Milano",
-            "inter-milan",
-            "INT",
-            "IT",
-            ucl.id,
-        )
-        psg = get_or_create_team(
-            "Paris Saint-Germain",
-            "Paris Saint-Germain Football Club",
-            "paris-saint-germain",
-            "PSG",
-            "FR",
-            ucl.id,
-        )
-        borussia_dortmund = get_or_create_team(
-            "Borussia Dortmund",
-            "Ballspielverein Borussia 09 e.V. Dortmund",
-            "borussia-dortmund",
-            "BVB",
-            "DE",
-            ucl.id,
-        )
-
-        lakers = get_or_create_team(
-            "Los Angeles Lakers",
-            "Los Angeles Lakers",
-            "los-angeles-lakers",
-            "LAL",
-            "US",
-            nba.id,
-        )
-        celtics = get_or_create_team(
-            "Boston Celtics",
-            "Boston Celtics",
-            "boston-celtics",
-            "BOS",
-            "US",
-            nba.id,
-        )
-        warriors = get_or_create_team(
-            "Golden State Warriors",
-            "Golden State Warriors",
-            "golden-state-warriors",
-            "GSW",
-            "US",
-            nba.id,
-        )
-        bulls = get_or_create_team(
-            "Chicago Bulls",
-            "Chicago Bulls",
-            "chicago-bulls",
-            "CHI",
-            "US",
-            nba.id,
-        )
-        real_madrid_basketball = get_or_create_team(
-            "Real Madrid Basketball",
-            "Real Madrid Baloncesto",
-            "real-madrid-basketball",
-            "RMB",
-            "ES",
-            euroleague.id,
-        )
-        fenerbahce = get_or_create_team(
-            "Fenerbahce Beko",
-            "Fenerbahce Beko Istanbul",
-            "fenerbahce-beko",
-            "FB",
-            "TR",
-            euroleague.id,
-        )
-        olympiacos = get_or_create_team(
-            "Olympiacos",
-            "Olympiacos B.C.",
-            "olympiacos",
-            "OLY",
-            "GR",
-            euroleague.id,
-        )
-        anadolu_efes = get_or_create_team(
-            "Anadolu Efes",
-            "Anadolu Efes S.K.",
-            "anadolu-efes",
-            "EFS",
-            "TR",
-            euroleague.id,
-        )
-
-        djokovic = get_or_create_team(
-            "Novak Djokovic",
-            "Novak Djokovic",
-            "novak-djokovic",
-            "NJD",
-            "RS",
-            atp_tour.id,
-        )
-        alcaraz = get_or_create_team(
-            "Carlos Alcaraz",
-            "Carlos Alcaraz",
-            "carlos-alcaraz",
-            "CAL",
-            "ES",
-            atp_tour.id,
-        )
-        medvedev = get_or_create_team(
-            "Daniil Medvedev",
-            "Daniil Medvedev",
-            "daniil-medvedev",
-            "DME",
-            "RU",
-            atp_tour.id,
-        )
-        sinner = get_or_create_team(
-            "Jannik Sinner",
-            "Jannik Sinner",
-            "jannik-sinner",
-            "JSI",
-            "IT",
-            atp_tour.id,
-        )
-        zverev = get_or_create_team(
-            "Alexander Zverev",
-            "Alexander Zverev",
-            "alexander-zverev",
-            "AZV",
-            "DE",
-            wimbledon.id,
-        )
-        tsitsipas = get_or_create_team(
-            "Stefanos Tsitsipas",
-            "Stefanos Tsitsipas",
-            "stefanos-tsitsipas",
-            "STS",
-            "GR",
-            wimbledon.id,
-        )
-        ruud = get_or_create_team(
-            "Casper Ruud",
-            "Casper Ruud",
-            "casper-ruud",
-            "CRU",
-            "NO",
-            roland_garros.id,
-        )
-        rune = get_or_create_team(
-            "Holger Rune",
-            "Holger Rune",
-            "holger-rune",
-            "HRU",
-            "DK",
-            roland_garros.id,
-        )
-
-        santiago_bernabeu = get_or_create_venue("Santiago Bernabeu", "Madrid", "ES")
-        etihad = get_or_create_venue("Etihad Stadium", "Manchester", "GB")
-        camp_nou = get_or_create_venue("Camp Nou", "Barcelona", "ES")
-        anfield = get_or_create_venue("Anfield", "Liverpool", "GB")
-        td_garden = get_or_create_venue("TD Garden", "Boston", "US")
-        crypto = get_or_create_venue("Crypto.com Arena", "Los Angeles", "US")
-        united_center = get_or_create_venue("United Center", "Chicago", "US")
-        centre_court = get_or_create_venue("Centre Court", "London", "GB")
-        chatrier = get_or_create_venue("Court Philippe-Chatrier", "Paris", "FR")
+        venues = {
+            "santiago-bernabeu": get_or_create_venue("Santiago Bernabeu", "Madrid", "ES"),
+            "camp-nou": get_or_create_venue("Camp Nou", "Barcelona", "ES"),
+            "etihad-stadium": get_or_create_venue("Etihad Stadium", "Manchester", "GB"),
+            "anfield": get_or_create_venue("Anfield", "Liverpool", "GB"),
+            "allianz-arena": get_or_create_venue("Allianz Arena", "Munich", "DE"),
+            "san-siro": get_or_create_venue("San Siro", "Milan", "IT"),
+            "crypto-arena": get_or_create_venue("Crypto.com Arena", "Los Angeles", "US"),
+            "td-garden": get_or_create_venue("TD Garden", "Boston", "US"),
+            "chase-center": get_or_create_venue("Chase Center", "San Francisco", "US"),
+            "united-center": get_or_create_venue("United Center", "Chicago", "US"),
+            "fiserv-forum": get_or_create_venue("Fiserv Forum", "Milwaukee", "US"),
+            "centre-court": get_or_create_venue("Centre Court", "London", "GB"),
+            "chatrier": get_or_create_venue("Court Philippe-Chatrier", "Paris", "FR"),
+            "arthur-ashe": get_or_create_venue("Arthur Ashe Stadium", "New York", "US"),
+            "silverstone": get_or_create_venue("Silverstone Circuit", "Silverstone", "GB"),
+            "monza": get_or_create_venue("Monza Circuit", "Monza", "IT"),
+            "spa": get_or_create_venue("Circuit de Spa-Francorchamps", "Stavelot", "BE"),
+            "yas-marina": get_or_create_venue("Yas Marina Circuit", "Abu Dhabi", "AE"),
+            "msg": get_or_create_venue("Madison Square Garden", "New York", "US"),
+            "t-mobile": get_or_create_venue("T-Mobile Arena", "Las Vegas", "US"),
+            "o2-arena": get_or_create_venue("O2 Arena", "London", "GB"),
+        }
 
         db.flush()
-
         today = date.today()
-        get_or_create_event(
-            title="Manchester City vs Liverpool",
-            event_date=today + timedelta(days=3),
-            event_time_utc=time(19, 30),
-            status="scheduled",
-            stage_name="Matchday 28",
-            stage_ordering=1,
-            description="Premier League top-table clash at Etihad Stadium.",
-            sport_id=football.id,
-            competition_id=premier_league.id,
-            home_team_id=manchester_city.id,
-            away_team_id=liverpool.id,
-            venue_id=etihad.id,
-        )
-        get_or_create_event(
-            title="Barcelona vs Real Madrid",
-            event_date=today + timedelta(days=6),
-            event_time_utc=time(18, 0),
-            status="scheduled",
-            stage_name="Matchday 30",
-            stage_ordering=1,
-            description="El Clasico in a key La Liga title-race week.",
-            sport_id=football.id,
-            competition_id=la_liga.id,
-            home_team_id=barcelona.id,
-            away_team_id=real_madrid.id,
-            venue_id=camp_nou.id,
-        )
-        get_or_create_event(
-            title="Paris Saint-Germain vs Bayern Munich",
-            event_date=today - timedelta(days=4),
-            event_time_utc=time(20, 0),
-            status="finished",
-            stage_name="Round of 16",
-            stage_ordering=1,
-            description="UEFA Champions League round of 16 second leg.",
-            sport_id=football.id,
-            competition_id=ucl.id,
-            home_team_id=psg.id,
-            away_team_id=bayern_munich.id,
-            venue_id=santiago_bernabeu.id,
-        )
-        get_or_create_event(
-            title="Inter Milan vs Paris Saint-Germain",
-            event_date=today - timedelta(days=8),
-            event_time_utc=time(19, 0),
-            status="finished",
-            stage_name="Group Stage",
-            stage_ordering=1,
-            description="UEFA Champions League group-stage meeting.",
-            sport_id=football.id,
-            competition_id=ucl.id,
-            home_team_id=inter_milan.id,
-            away_team_id=psg.id,
-            venue_id=anfield.id,
-        )
-        get_or_create_event(
-            title="Los Angeles Lakers vs Boston Celtics",
-            event_date=today + timedelta(days=2),
-            event_time_utc=time(2, 30),
-            status="scheduled",
-            stage_name="Regular Season",
-            stage_ordering=1,
-            description="Classic NBA rivalry game.",
-            sport_id=basketball.id,
-            competition_id=nba.id,
-            home_team_id=lakers.id,
-            away_team_id=celtics.id,
-            venue_id=crypto.id,
-        )
-        get_or_create_event(
-            title="Golden State Warriors vs Chicago Bulls",
-            event_date=today + timedelta(days=9),
-            event_time_utc=time(3, 0),
-            status="scheduled",
-            stage_name="Regular Season",
-            stage_ordering=1,
-            description="Cross-conference NBA matchup in Chicago.",
-            sport_id=basketball.id,
-            competition_id=nba.id,
-            home_team_id=warriors.id,
-            away_team_id=bulls.id,
-            venue_id=united_center.id,
-        )
-        get_or_create_event(
-            title="Real Madrid Basketball vs Fenerbahce Beko",
-            event_date=today - timedelta(days=3),
-            event_time_utc=time(17, 0),
-            status="finished",
-            stage_name="Regular Season",
-            stage_ordering=1,
-            description="EuroLeague regular season fixture.",
-            sport_id=basketball.id,
-            competition_id=euroleague.id,
-            home_team_id=real_madrid_basketball.id,
-            away_team_id=fenerbahce.id,
-            venue_id=crypto.id,
-        )
-        get_or_create_event(
-            title="Olympiacos vs Anadolu Efes",
-            event_date=today - timedelta(days=10),
-            event_time_utc=time(18, 30),
-            status="finished",
-            stage_name="Regular Season",
-            stage_ordering=1,
-            description="EuroLeague defensive battle.",
-            sport_id=basketball.id,
-            competition_id=euroleague.id,
-            home_team_id=olympiacos.id,
-            away_team_id=anadolu_efes.id,
-            venue_id=united_center.id,
-        )
-        get_or_create_event(
-            title="Djokovic vs Alcaraz",
-            event_date=today + timedelta(days=1),
-            event_time_utc=time(13, 0),
-            status="scheduled",
-            stage_name="Final",
-            stage_ordering=1,
-            description="ATP Tour marquee final.",
-            sport_id=tennis.id,
-            competition_id=atp_tour.id,
-            home_team_id=djokovic.id,
-            away_team_id=alcaraz.id,
-            venue_id=centre_court.id,
-        )
-        get_or_create_event(
-            title="Sinner vs Medvedev",
-            event_date=today + timedelta(days=5),
-            event_time_utc=time(11, 30),
-            status="scheduled",
-            stage_name="Semi Final",
-            stage_ordering=1,
-            description="ATP Tour semi-final.",
-            sport_id=tennis.id,
-            competition_id=atp_tour.id,
-            home_team_id=sinner.id,
-            away_team_id=medvedev.id,
-            venue_id=centre_court.id,
-        )
-        get_or_create_event(
-            title="Zverev vs Tsitsipas",
-            event_date=today - timedelta(days=2),
-            event_time_utc=time(12, 0),
-            status="finished",
-            stage_name="Quarter Final",
-            stage_ordering=1,
-            description="Wimbledon quarter-final.",
-            sport_id=tennis.id,
-            competition_id=wimbledon.id,
-            home_team_id=zverev.id,
-            away_team_id=tsitsipas.id,
-            venue_id=centre_court.id,
-        )
-        get_or_create_event(
-            title="Ruud vs Rune",
-            event_date=today - timedelta(days=6),
-            event_time_utc=time(14, 0),
-            status="finished",
-            stage_name="Round of 16",
-            stage_ordering=1,
-            description="Roland Garros round of 16 clash.",
-            sport_id=tennis.id,
-            competition_id=roland_garros.id,
-            home_team_id=ruud.id,
-            away_team_id=rune.id,
-            venue_id=chatrier.id,
-        )
-        get_or_create_event(
-            title="Borussia Dortmund vs Arsenal",
-            event_date=today + timedelta(days=12),
-            event_time_utc=time(19, 45),
-            status="scheduled",
-            stage_name="Quarter Final",
-            stage_ordering=1,
-            description="UEFA Champions League knockout tie.",
-            sport_id=football.id,
-            competition_id=ucl.id,
-            home_team_id=borussia_dortmund.id,
-            away_team_id=bayern_munich.id,
-            venue_id=santiago_bernabeu.id,
-        )
+
+        event_specs = [
+            # Football
+            ("manchester-city", "liverpool", "football", "epl", "etihad-stadium", 3, time(19, 30), "Matchday 28", "Premier League top-table clash."),
+            ("arsenal", "manchester-city", "football", "epl", "anfield", 7, time(18, 45), "Matchday 29", "Title-race six-pointer."),
+            ("liverpool", "arsenal", "football", "epl", "anfield", 10, time(20, 0), "Matchday 30", "High-intensity league fixture."),
+            ("barcelona", "real-madrid", "football", "laliga", "camp-nou", -5, time(19, 0), "Matchday 31", "El Clasico weekend clash."),
+            ("juventus", "inter-milan", "football", "seriea", "san-siro", -9, time(19, 45), "Matchday 30", "Derby d'Italia battle."),
+            ("bayern-munich", "paris-saint-germain", "football", "ucl", "allianz-arena", -2, time(20, 0), "Round of 16", "Champions League knockout tie."),
+            ("borussia-dortmund", "bayern-munich", "football", "ucl", "allianz-arena", 14, time(20, 0), "Quarter Final", "All-German European showdown."),
+            # Basketball
+            ("los-angeles-lakers", "boston-celtics", "basketball", "nba", "crypto-arena", 2, time(2, 30), "Regular Season", "Classic NBA rivalry game."),
+            ("golden-state-warriors", "chicago-bulls", "basketball", "nba", "chase-center", 6, time(3, 0), "Regular Season", "Fast-paced cross-conference matchup."),
+            ("milwaukee-bucks", "miami-heat", "basketball", "nba", "fiserv-forum", -3, time(1, 0), "Regular Season", "Eastern Conference playoff race game."),
+            ("real-madrid-basketball", "fenerbahce-beko", "basketball", "euroleague", "td-garden", 9, time(18, 0), "Regular Season", "Top EuroLeague teams collide."),
+            ("olympiacos", "anadolu-efes", "basketball", "euroleague", "united-center", -8, time(19, 0), "Regular Season", "Tight EuroLeague contest."),
+            # Tennis
+            ("novak-djokovic", "carlos-alcaraz", "tennis", "atp", "centre-court", 1, time(13, 0), "Final", "ATP Tour marquee final."),
+            ("jannik-sinner", "daniil-medvedev", "tennis", "atp", "centre-court", 5, time(11, 30), "Semi Final", "Hard-court semi-final showdown."),
+            ("alexander-zverev", "stefanos-tsitsipas", "tennis", "wimbledon", "centre-court", -4, time(12, 0), "Quarter Final", "Wimbledon quarter-final match."),
+            ("casper-ruud", "holger-rune", "tennis", "rg", "chatrier", -7, time(14, 0), "Round of 16", "Roland Garros clay-court battle."),
+            ("novak-djokovic", "jannik-sinner", "tennis", "atp", "arthur-ashe", 12, time(23, 0), "Semi Final", "Late-session hard-court semifinal."),
+            # Formula 1
+            ("max-verstappen", "lewis-hamilton", "f1", "f1wc", "silverstone", 4, time(13, 0), "Grand Prix", "Wheel-to-wheel title fight at Silverstone."),
+            ("charles-leclerc", "lando-norris", "f1", "f1wc", "monza", 15, time(14, 0), "Grand Prix", "Italian Grand Prix headline duel."),
+            ("george-russell", "fernando-alonso", "f1", "f1wc", "spa", -6, time(13, 30), "Grand Prix", "Strategic race in changeable conditions."),
+            ("max-verstappen", "charles-leclerc", "f1", "f1wc", "yas-marina", -11, time(16, 0), "Grand Prix", "Season finale decider."),
+            ("lewis-hamilton", "lando-norris", "f1", "f1wc", "silverstone", 20, time(12, 30), "Sprint", "Short-format sprint showdown."),
+            # MMA
+            ("alex-pereira", "khamzat-chimaev", "mma", "ufc", "msg", 8, time(22, 0), "Main Event", "Five-round headline bout."),
+            ("islam-makhachev", "sean-omalley", "mma", "ufc", "t-mobile", 18, time(23, 30), "Title Fight", "Championship super-fight."),
+            ("khamzat-chimaev", "islam-makhachev", "mma", "ufc", "o2-arena", -5, time(21, 0), "Co-Main Event", "Top contenders collide."),
+            ("leon-edwards", "tom-aspinall", "mma", "pfl", "msg", -10, time(20, 30), "Playoff", "PFL playoff elimination bout."),
+            ("tom-aspinall", "leon-edwards", "mma", "pfl", "t-mobile", 25, time(22, 30), "Final", "PFL season final matchup."),
+        ]
+
+        for home_slug, away_slug, sport_key, competition_key, venue_key, day_offset, start_time, stage_name, description in event_specs:
+            event_dt = today + timedelta(days=day_offset)
+            status = "scheduled" if day_offset >= 0 else "finished"
+            home = teams[home_slug]
+            away = teams[away_slug]
+            title = f"{home.name} vs {away.name}"
+            get_or_create_event(
+                title=title,
+                event_date=event_dt,
+                event_time_utc=start_time,
+                status=status,
+                stage_name=stage_name,
+                stage_ordering=1,
+                description=description,
+                sport_id=sports[sport_key].id,
+                competition_id=competitions[competition_key].id,
+                home_team_id=home.id,
+                away_team_id=away.id,
+                venue_id=venues[venue_key].id,
+            )
 
         db.commit()
     finally:
