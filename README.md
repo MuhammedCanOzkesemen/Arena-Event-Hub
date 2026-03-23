@@ -17,6 +17,15 @@ A clean, backend-focused sports event calendar application built for the Sportra
 
 ### ER Diagram
 ![ERD](docs/images/erd.png)
+
+## 🧪 Tests
+
+The project includes automated tests to verify core functionality such as event creation, filtering, and validation.
+
+All tests pass successfully:
+
+![Tests](docs/images/tests.png)
+
 ---
 
 ## 🧠 Project Overview
