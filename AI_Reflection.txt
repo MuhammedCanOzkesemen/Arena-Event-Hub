@@ -1,14 +1,31 @@
-This initial foundation focuses on clarity over complexity.
+This project was built as a backend application to manage sports events in a structured and reliable way.
 
-What worked well:
-- Normalized entity model with explicit foreign keys.
-- Underscore-prefixed foreign key fields are consistent across all models.
-- A small repository-service-router flow keeps responsibilities clear.
-- API and HTML routes share the same service logic for predictable behavior.
-- Basic filtering by sport and event date is supported in both API and HTML views.
-- Tests validate core app availability and API list behavior.
+During development, I used AI tools as a support tool to speed up some parts of the process, such as generating initial code ideas or exploring different approaches.
 
-Trade-offs:
-- Table creation is done at startup for simplicity instead of migrations.
-- Validation is intentionally lightweight in this first version.
-- Authentication and authorization are intentionally omitted.
+However, I did not rely on AI blindly. I reviewed, tested, and adjusted all important parts of the system myself.
+
+My main focus was to build a system that is correct, not just working.
+
+I made sure that:
+- the data model is clear and connected (Sport → Competition → Team → Event)
+- all relationships are valid
+- incorrect inputs are handled safely
+- the system does not break with edge cases
+
+For example, I handled situations like:
+- preventing the same team from playing against itself
+- ensuring teams belong to the correct competition
+- avoiding broken filters when inputs are empty
+- fixing route conflicts and data inconsistencies
+
+In several cases, AI suggestions were not correct or complete, so I had to adjust the logic and improve the implementation.
+
+I used AI mainly to support productivity, but all final decisions, structure, and validation rules were implemented and verified by me.
+
+The final result is a backend system that is:
+- structured
+- predictable
+- and easy to understand
+
+This project reflects how I approach backend development:
+I focus on correctness, clarity, and clean design rather than just making things work.
