@@ -1,6 +1,6 @@
 from datetime import date, time
 
-from fastapi import APIRouter, Depends, Form, Query, Request, status
+from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request, status
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
@@ -127,7 +127,7 @@ def create_event_page(
 
     try:
         event = service.create_event(db=db, payload=payload)
-    except ValueError as exc:
+    except HTTPException as exc:
         sports = list(db.scalars(select(Sport).order_by(Sport.name.asc())).all())
         competitions = list(db.scalars(select(Competition).order_by(Competition.name.asc())).all())
         teams = list(db.scalars(select(Team).order_by(Team.name.asc())).all())
@@ -135,7 +135,7 @@ def create_event_page(
         return templates.TemplateResponse(
             request=request,
             name="events/create.html",
-            context={"sports": sports, "competitions": competitions, "teams": teams, "venues": venues, "error": str(exc)},
+            context={"sports": sports, "competitions": competitions, "teams": teams, "venues": venues, "error": str(exc.detail)},
             status_code=status.HTTP_400_BAD_REQUEST,
         )
     return RedirectResponse(url=f"/events/{event.id}?created=1", status_code=status.HTTP_303_SEE_OTHER)
